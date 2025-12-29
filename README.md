@@ -42,6 +42,7 @@ Optional scripts live under `<tag>/optional/`.
 
 ```bash
 ./install.sh --base--spotify
+./install.sh --dev--cursor
 ```
 
 - Install everything (all tags + all optional scripts):

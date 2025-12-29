@@ -1,4 +1,4 @@
-log "Installing Jagex Launcher repo + launcher..."
+log "Installing Bolt (Flatpak)..."
 
 # Avoid any interactive apt/debconf prompts.
 export DEBIAN_FRONTEND=noninteractive
@@ -11,8 +11,10 @@ if ! have_cmd flatpak; then
   sudo_run apt-get install -y flatpak
 fi
 
-# Install using the upstream helper script.
-fetch_url "https://raw.githubusercontent.com/nmlynch94/com.jagexlauncher.JagexLauncher/main/install-jagex-launcher-repo.sh" | bash
+# Ensure Flathub exists (Bolt is published there).
+sudo_run flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo >/dev/null 2>&1 || true
 
-log "Done (Jagex Launcher)."
+sudo_run flatpak install -y --noninteractive flathub com.adamcake.Bolt
+
+log "Done (Bolt)."
 

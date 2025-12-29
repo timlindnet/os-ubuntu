@@ -5,11 +5,11 @@ Folder-driven installer for fresh Ubuntu installs, with optional tags (e.g. `--d
 ## One-liner usage
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/<you>/<repo>/main/bootstrap.sh | bash -s -- --base --dev --gaming --optional
+curl -fsSL https://raw.githubusercontent.com/timlindnet/os-ubuntu/main/bootstrap.sh | bash -s -- --base --dev --gaming --optional
 ```
 
 ```bash
-wget -qO- https://raw.githubusercontent.com/<you>/<repo>/main/bootstrap.sh | bash -s -- --base --dev --gaming --optional
+wget -qO- https://raw.githubusercontent.com/timlindnet/os-ubuntu/main/bootstrap.sh | bash -s -- --base --dev --gaming --optional
 ```
 
 Only one of `curl` or `wget` is required; the bootstrap step installs just one if needed.

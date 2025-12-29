@@ -27,6 +27,11 @@ run_install() {
     if [[ ! -d "$root_dir/$tag" ]]; then
       die "Unknown tag folder: $tag (missing directory: $root_dir/$tag)"
     fi
+
+    # Run per-tag prerequisites (e.g. apt update) before any scripts in this tag.
+    log "Running per-tag scripts: pre-tag/ (for $tag)"
+    run_folder "$root_dir/pre-tag" "pre-tag" || die "Failed in pre-tag/"
+
     log "Running tag folder: $tag/"
     run_folder "$root_dir/$tag" "$tag" || die "Failed in tag: $tag/"
 

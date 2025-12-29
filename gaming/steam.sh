@@ -1,5 +1,4 @@
 log "Installing Steam (apt)..."
-sudo_run apt-get update -y
 
 # Package name differs by Ubuntu release; try the common options.
 if apt-cache show steam-installer >/dev/null 2>&1; then

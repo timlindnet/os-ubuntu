@@ -4,3 +4,6 @@
 ## Common noise
 *.log
 .DS_Store
+
+## Local scratch / temp artifacts
+.tmp_*

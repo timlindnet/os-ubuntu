@@ -92,8 +92,9 @@ parse_args() {
   done
 
   # Default tags (when installing) unless user explicitly provided tags.
+  # Keep default minimal: base only.
   if [[ "$MODE" == "install" && ${#TAGS[@]} -eq 0 ]]; then
-    TAGS=("base" "dev" "gaming")
+    TAGS=("base")
   fi
 }
 

@@ -1,0 +1,22 @@
+# Cursor rules for this repo (os-ubuntu)
+
+## Primary goal
+Keep this repo **KISS**: minimal, stable, low-maintenance bash automation for Ubuntu 24+.
+
+## Script conventions
+- Scripts in `req/`, `pre/`, `<tag>/`, and `<tag>/optional/` are **snippets**.
+  - They MUST NOT include boilerplate like `#!/usr/bin/env bash`, `set -euo pipefail`, `source lib/common.sh`, or `ensure_ubuntu`.
+  - They are executed via `lib/run-script.sh`, which applies strict mode and loads shared helpers.
+- Prefer using helpers from `lib/common.sh`:
+  - `sudo_run`, `log`, `die`, `fetch_url` (curl/wget agnostic).
+
+## KISS / stability rules
+- Prefer `apt-get install -y <pkg>` / `snap install <pkg>` over manual repo/key management.
+- Avoid PPAs and custom kernels unless there is a clear, stable, Ubuntu-supported reason.
+- Avoid version-specific branching where possible; target Ubuntu 24+.
+- Minimize new dependencies and avoid “install both curl and wget”.
+
+## Optional scripts
+- Optional scripts live under `<tag>/optional/` and are installed only via:
+  - `-o/--optional` (for selected tags), `--<tag>-optional`, or `--<tag>--<script>`.
+

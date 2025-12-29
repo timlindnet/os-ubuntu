@@ -3,6 +3,8 @@
 # - keep existing config if a prompt would occur
 export DEBIAN_FRONTEND=noninteractive
 
+apt_recover_dpkg
+
 log "Upgrading installed packages (apt-get upgrade)..."
 sudo_run apt-get upgrade -y \
   -o Dpkg::Options::=--force-confdef \

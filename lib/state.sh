@@ -88,6 +88,7 @@ ensure_git_installed() {
   fi
   log "git not found; installing it (required for snapshots)"
   ensure_ubuntu
+  apt_recover_dpkg
   sudo_run apt-get update -y
   sudo_run apt-get install -y git ca-certificates
 }

@@ -24,6 +24,7 @@ if [[ ${#need[@]} -eq 0 ]]; then
 fi
 
 log "Installing bootstrap tools: ${need[*]}"
+apt_recover_dpkg
 sudo_run apt-get update -y
 sudo_run apt-get install -y "${need[@]}"
 

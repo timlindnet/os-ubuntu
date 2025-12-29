@@ -61,3 +61,15 @@ ensure_ubuntu() {
   fi
 }
 
+apt_recover_dpkg() {
+  # In some environments dpkg can be left half-configured (e.g. interrupted upgrade),
+  # which blocks any apt operation with:
+  #   "E: dpkg was interrupted, you must manually run 'sudo dpkg --configure -a' ..."
+  #
+  # Running this proactively is safe when dpkg is healthy (it's effectively a no-op).
+  log "Ensuring dpkg is configured (dpkg --configure -a)..."
+  if ! sudo_run dpkg --configure -a; then
+    die "dpkg is in a broken state. Try: sudo dpkg --configure -a && sudo apt-get -f install"
+  fi
+}
+

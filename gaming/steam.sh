@@ -1,5 +1,8 @@
 log "Installing Steam (apt)..."
 
+# Ensure dpkg isn't left half-configured (blocks apt operations).
+apt_recover_dpkg
+
 # Steam is a 32-bit program and expects i386 multiarch enabled.
 # If an Nvidia proprietary driver is present, Steam also needs 32-bit Nvidia libs.
 added_i386_arch="no"

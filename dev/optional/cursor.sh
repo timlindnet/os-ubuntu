@@ -27,11 +27,13 @@ trap 'rm -f "$tmp"' RETURN
 fetch_url "$url" >"$tmp"
 
 # Prefer apt installing local deb (pulls dependencies). Fallback to dpkg if needed.
+apt_recover_dpkg
 if sudo_run apt-get install -y "$tmp"; then
   :
 else
   warn "apt-get install of local .deb failed; trying dpkg + fix deps"
   sudo_run dpkg -i "$tmp" || true
+  apt_recover_dpkg
   sudo_run apt-get -f install -y
 fi
 

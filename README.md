@@ -60,7 +60,7 @@ Only one of `curl` or `wget` is required; the bootstrap step installs just one i
 
 - Always runs:
   - `req/` (bootstrap tools like `git`, `curl`, `wget`)
-  - `pre/` (e.g. `apt update`, optional upgrade)
+  - `pre/` (e.g. `apt update`, `apt upgrade`)
 - Runs tag folders only when selected:
   - `base/`, `dev/`, `gaming/`, etc.
 

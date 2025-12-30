@@ -7,7 +7,7 @@ run_install() {
 
   local os_root="$repo_root/$os"
   [[ -d "$os_root" ]] || die "Unknown OS folder: $os (missing directory: $os_root)"
-  [[ -f "$os_root/lib/os.sh" ]] || die "Missing OS library: $os_root/lib/os.sh"
+  [[ -f "$os_root/_lib/os.sh" ]] || die "Missing OS library: $os_root/_lib/os.sh"
 
   export LOADOUT_REPO_ROOT="$repo_root"
   export LOADOUT_OS="$os"
@@ -18,11 +18,11 @@ run_install() {
     export OS_UBUNTU_ROOT="$os_root"
   fi
 
-  log "Running always-on scripts: $os/req/"
-  run_folder "$repo_root" "$os_root/req" "$os/req" "req" || die "Failed in $os/req/"
+  log "Running always-on scripts: $os/_req/"
+  run_folder "$repo_root" "$os_root/_req" "$os/_req" "req" || die "Failed in $os/_req/"
 
-  log "Running always-on scripts: $os/pre/"
-  run_folder "$repo_root" "$os_root/pre" "$os/pre" "pre" || die "Failed in $os/pre/"
+  log "Running always-on scripts: $os/_pre/"
+  run_folder "$repo_root" "$os_root/_pre" "$os/_pre" "pre" || die "Failed in $os/_pre/"
 
   local tags=()
   if [[ "${INSTALL_ALL:-false}" == "true" ]]; then

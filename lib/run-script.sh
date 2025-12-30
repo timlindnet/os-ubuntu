@@ -34,7 +34,7 @@ source "$REPO_ROOT/lib/common.sh"
 
 # OS-specific helpers.
 # shellcheck disable=SC1090
-source "$OS_ROOT/lib/os.sh"
+source "$OS_ROOT/_lib/os.sh"
 
 ensure_os
 

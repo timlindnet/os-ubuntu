@@ -36,6 +36,7 @@ Tags correspond to folders under `<os>/` (e.g. `ubuntu/base/`, `ubuntu/dev/`, `u
 
 - **Purpose**: keep installs modular. You choose *what kind of machine* you’re setting up by selecting tags.
 - **`base`**: OS-level “foundation” changes meant to improve stability/security (packages, system settings, prerequisites). It should avoid app-specific installs.
+- **Naming**: folders prefixed with `_` (e.g. `ubuntu/_lib/`, `ubuntu/_pre/`, `ubuntu/_req/`) are internal and **cannot** be targeted as tags.
 
 - Install every tag folder:
 
@@ -83,8 +84,8 @@ loadout --games--rs3
 ## Folder execution model
 
 - Always runs:
-  - `<os>/req/` (bootstrap tools like a downloader + certs)
-  - `<os>/pre/` (e.g. `apt update`, `apt upgrade`)
+  - `<os>/_req/` (bootstrap tools like a downloader + certs)
+  - `<os>/_pre/` (e.g. `apt update`, `apt upgrade`)
 - Runs tag folders only when selected:
   - `<os>/base/`, `<os>/dev/`, `<os>/gaming/`, etc.
 
@@ -92,5 +93,5 @@ Scripts within a folder run in lexicographic order (use prefixes like `10-...sh`
 
 ### Script boilerplate
 
-To keep scripts small, files under `<os>/req/`, `<os>/pre/`, and OS tag folders are treated as **snippets** and are executed via `lib/run-script.sh`, which applies `set -euo pipefail`, sources `lib/common.sh`, then sources `<os>/lib/os.sh` and runs `ensure_os` for each script.
+To keep scripts small, files under `<os>/_req/`, `<os>/_pre/`, and OS tag folders are treated as **snippets** and are executed via `lib/run-script.sh`, which applies `set -euo pipefail`, sources `lib/common.sh`, then sources `<os>/_lib/os.sh` and runs `ensure_os` for each script.
 

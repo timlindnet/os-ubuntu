@@ -11,7 +11,7 @@ This repo is intentionally **simple bash**. Prefer the simplest stable mechanism
 
 ## Script style
 
-- Files under `<os>/req/`, `<os>/pre/`, and OS tag folders are **snippets** (not standalone programs).
+- Files under `<os>/_req/`, `<os>/_pre/`, and OS tag folders are **snippets** (not standalone programs).
   - They run via `lib/run-script.sh` which applies strict mode and sources `lib/common.sh`.
   - Do **not** add shebangs or duplicate `set -euo pipefail`/`ensure_os` in these scripts.
 - Use helpers from `lib/common.sh`:
@@ -19,7 +19,7 @@ This repo is intentionally **simple bash**. Prefer the simplest stable mechanism
 
 ## Folder conventions
 
-- Always run: `<os>/req/`, `<os>/pre/`
+- Always run: `<os>/_req/`, `<os>/_pre/`
 - Tags: `<os>/<tag>/`
 - Optional scripts: `<os>/<tag>/optional/`
   - `-o/--optional` installs optional scripts for selected tags

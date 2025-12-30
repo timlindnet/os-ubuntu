@@ -141,7 +141,7 @@ list_tags() {
     local name
     name="$(basename "$d")"
     case "$name" in
-      .git|lib|req|pre) continue ;;
+      .git|_lib|_req|_pre|_*) continue ;;
     esac
     printf "%s\n" "$name"
   done | sort

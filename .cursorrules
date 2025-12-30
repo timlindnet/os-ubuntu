@@ -4,7 +4,7 @@
 Keep this repo **KISS**: minimal, stable, low-maintenance bash automation (starting with Ubuntu 24+).
 
 ## Script conventions
-- Scripts in `<os>/req/`, `<os>/pre/`, `<os>/<tag>/`, and `<os>/<tag>/optional/` are **snippets**.
+- Scripts in `<os>/_req/`, `<os>/_pre/`, `<os>/<tag>/`, and `<os>/<tag>/optional/` are **snippets**.
  - They MUST NOT include boilerplate like `#!/usr/bin/env bash`, `set -euo pipefail`, `source lib/common.sh`, or `ensure_os`.
   - They are executed via `lib/run-script.sh`, which applies strict mode and loads shared helpers.
 - Prefer using helpers from `lib/common.sh`:

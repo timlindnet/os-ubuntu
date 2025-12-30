@@ -24,8 +24,14 @@ if [[ -s "$NVM_DIR/nvm.sh" ]]; then
   fi
 
   lts_ok="false"
-  if nvm ls --no-colors --lts 2>/dev/null | grep -qE '\bv[0-9]+'; then
-    lts_ok="true"
+  # Prefer a direct check: resolve the current LTS target and confirm it's installed.
+  # This avoids brittle parsing of `nvm ls --lts` output under strict/pipefail.
+  lts_ver="$(nvm version 'lts/*' 2>/dev/null || true)"
+  if [[ "$lts_ver" =~ ^v[0-9]+ ]]; then
+    lts_path="$(nvm which "$lts_ver" 2>/dev/null || true)"
+    if [[ -n "$lts_path" && -x "$lts_path" ]]; then
+      lts_ok="true"
+    fi
   fi
 
   if [[ "$alias_ok" == "true" && "$lts_ok" == "true" ]]; then
@@ -46,7 +52,16 @@ fi
 # shellcheck disable=SC1091
 source "$NVM_DIR/nvm.sh"
 
-if ! nvm ls --no-colors --lts 2>/dev/null | grep -qE '\bv[0-9]+'; then
+need_install="true"
+lts_ver="$(nvm version 'lts/*' 2>/dev/null || true)"
+if [[ "$lts_ver" =~ ^v[0-9]+ ]]; then
+  lts_path="$(nvm which "$lts_ver" 2>/dev/null || true)"
+  if [[ -n "$lts_path" && -x "$lts_path" ]]; then
+    need_install="false"
+  fi
+fi
+
+if [[ "$need_install" == "true" ]]; then
   nvm install --lts
 fi
 

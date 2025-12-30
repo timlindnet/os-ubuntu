@@ -4,7 +4,7 @@ if [[ -z "$target_home" ]]; then
   die "Cannot resolve home directory for user: $target_user"
 fi
 
-log "Installing nvm + Node LTS for user: $target_user"
+log "Ensuring nvm + Node LTS for user: $target_user"
 
 install_nvm_cmd=$(
   cat <<'EOF'
@@ -12,60 +12,47 @@ set -euo pipefail
 export NVM_DIR="$HOME/.nvm"
 mkdir -p "$NVM_DIR"
 
-# Fast path: if nvm exists and Node LTS + default alias are already in place,
-# do nothing (avoid network and avoid reconfiguring).
+# Fast path (must be at the beginning): if nvm exists, LTS is installed, and
+# default alias already points at lts/*, do nothing.
 if [[ -s "$NVM_DIR/nvm.sh" ]]; then
   # shellcheck disable=SC1091
   source "$NVM_DIR/nvm.sh"
 
-  alias_ok="false"
-  if [[ -f "$NVM_DIR/alias/default" ]] && grep -qx "lts/*" "$NVM_DIR/alias/default"; then
-    alias_ok="true"
-  fi
+  lts_path="$(nvm which 'lts/*' 2>/dev/null || true)"
 
-  lts_ok="false"
-  # Prefer a direct check: resolve the current LTS target and confirm it's installed.
-  # This avoids brittle parsing of `nvm ls --lts` output under strict/pipefail.
-  lts_ver="$(nvm version 'lts/*' 2>/dev/null || true)"
-  if [[ "$lts_ver" =~ ^v[0-9]+ ]]; then
-    lts_path="$(nvm which "$lts_ver" 2>/dev/null || true)"
-    if [[ -n "$lts_path" && -x "$lts_path" ]]; then
-      lts_ok="true"
+  default_ok="false"
+  if [[ -f "$NVM_DIR/alias/default" ]]; then
+    default_alias="$(<"$NVM_DIR/alias/default")"
+    if [[ "$default_alias" == "lts/*" ]]; then
+      default_ok="true"
     fi
   fi
 
-  if [[ "$alias_ok" == "true" && "$lts_ok" == "true" ]]; then
+  if [[ -n "$lts_path" && -x "$lts_path" && "$default_ok" == "true" ]]; then
     exit 0
   fi
 fi
 
+# Install nvm (pinned) if missing.
 if [[ ! -s "$NVM_DIR/nvm.sh" ]]; then
-  if command -v curl >/dev/null 2>&1; then
-    curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
-  elif command -v wget >/dev/null 2>&1; then
-    wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
-  else
-    echo "Need curl or wget to install nvm" >&2
+  if ! command -v wget >/dev/null 2>&1; then
+    echo "Need wget to install nvm" >&2
     exit 1
   fi
+  wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
 fi
+
 # shellcheck disable=SC1091
 source "$NVM_DIR/nvm.sh"
 
-need_install="true"
-lts_ver="$(nvm version 'lts/*' 2>/dev/null || true)"
-if [[ "$lts_ver" =~ ^v[0-9]+ ]]; then
-  lts_path="$(nvm which "$lts_ver" 2>/dev/null || true)"
-  if [[ -n "$lts_path" && -x "$lts_path" ]]; then
-    need_install="false"
-  fi
-fi
-
-if [[ "$need_install" == "true" ]]; then
+# Install latest LTS if missing.
+lts_path="$(nvm which 'lts/*' 2>/dev/null || true)"
+if [[ -z "$lts_path" || ! -x "$lts_path" ]]; then
   nvm install --lts
 fi
 
-if [[ ! -f "$NVM_DIR/alias/default" ]] || ! grep -qx "lts/*" "$NVM_DIR/alias/default"; then
+# Ensure default alias points to LTS.
+if [[ ! -f "$NVM_DIR/alias/default" ]] || [[ "$( <"$NVM_DIR/alias/default")" != "lts/*" ]]; then
   nvm alias default 'lts/*' >/dev/null
 fi
 EOF

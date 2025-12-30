@@ -12,6 +12,16 @@ curl -fsSL https://loadout.timlind.net | bash -s -- ubuntu --base --dev --gaming
 wget -qO- https://loadout.timlind.net | bash -s -- ubuntu --base --dev --gaming --optional
 ```
 
+If you prefer to bypass `loadout.timlind.net`, you can use GitHub directly:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/timlindnet/loadout/main/bootstrap.sh | bash -s -- ubuntu --base --dev --gaming --optional
+```
+
+```bash
+wget -qO- https://raw.githubusercontent.com/timlindnet/loadout/main/bootstrap.sh | bash -s -- ubuntu --base --dev --gaming --optional
+```
+
 > Note: if you want to pass arguments to a script read from stdin, you need `bash -s -- ...`.
 
 The bootstrap also installs a helper command so you can later run:

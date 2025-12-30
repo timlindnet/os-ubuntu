@@ -18,6 +18,8 @@ print_help() {
 loadout: folder-driven OS setup (bash)
 
 Usage:
+  loadout --base --dev --gaming
+  wget -qO-  https://loadout.timlind.net | bash -s -- ubuntu --base --dev --gaming
   curl -fsSL https://loadout.timlind.net | bash -s -- ubuntu --base --dev --gaming
 
 Modes:
@@ -37,7 +39,7 @@ Notes:
       - To also run optional scripts: --all-tags -o
   - Explicit scripts live under <tag>/explicit/
     - They are only installed via --<tag>--<script> (never via -o/--optional)
-  - For curl/wget piping: bash -s -- <args>
+  - For stdin piping (wget/curl): bash -s -- <args>
 EOF
 }
 

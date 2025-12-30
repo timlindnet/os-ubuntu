@@ -2,6 +2,10 @@
 set -euo pipefail
 
 state_git_name() {
+  if [[ -n "${LOADOUT_STATE_GIT_NAME:-}" ]]; then
+    printf "%s" "$LOADOUT_STATE_GIT_NAME"
+    return 0
+  fi
   if [[ -n "${OS_UBUNTU_STATE_GIT_NAME:-}" ]]; then
     printf "%s" "$OS_UBUNTU_STATE_GIT_NAME"
     return 0
@@ -9,10 +13,14 @@ state_git_name() {
   local u="${SUDO_USER:-${USER:-user}}"
   local h
   h="$(hostname -s 2>/dev/null || hostname 2>/dev/null || echo local)"
-  printf "os-ubuntu snapshot (%s@%s)" "$u" "$h"
+  printf "loadout snapshot (%s@%s)" "$u" "$h"
 }
 
 state_git_email() {
+  if [[ -n "${LOADOUT_STATE_GIT_EMAIL:-}" ]]; then
+    printf "%s" "$LOADOUT_STATE_GIT_EMAIL"
+    return 0
+  fi
   if [[ -n "${OS_UBUNTU_STATE_GIT_EMAIL:-}" ]]; then
     printf "%s" "$OS_UBUNTU_STATE_GIT_EMAIL"
     return 0
@@ -61,9 +69,9 @@ ensure_state_repo() {
   mkdir -p "$state_dir/snapshot"
   if [[ ! -f "$state_dir/README.md" ]]; then
     cat >"$state_dir/README.md" <<'EOF'
-# os-ubuntu state snapshots
+# loadout state snapshots
 
-This directory is a separate git repository created by `os-ubuntu`.
+This directory is a separate git repository created by `loadout`.
 
 Each snapshot is a commit whose tree contains a `snapshot/` folder (package lists, sources, metadata) plus an `apply.sh` helper.
 
@@ -87,10 +95,9 @@ ensure_git_installed() {
     return 0
   fi
   log "git not found; installing it (required for snapshots)"
-  ensure_ubuntu
-  apt_recover_dpkg
-  sudo_run apt-get update -y
-  sudo_run apt-get install -y git ca-certificates
+  # Requires OS helper functions to be available (ensure_os + os_pkg_install).
+  ensure_os
+  os_pkg_install git ca-certificates
 }
 
 snapshot_create_commit() {

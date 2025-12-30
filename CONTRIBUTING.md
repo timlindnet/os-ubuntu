@@ -11,17 +11,17 @@ This repo is intentionally **simple bash**. Prefer the simplest stable mechanism
 
 ## Script style
 
-- Files under `req/`, `pre/`, and tag folders are **snippets** (not standalone programs).
+- Files under `<os>/req/`, `<os>/pre/`, and OS tag folders are **snippets** (not standalone programs).
   - They run via `lib/run-script.sh` which applies strict mode and sources `lib/common.sh`.
-  - Do **not** add shebangs or duplicate `set -euo pipefail`/`ensure_ubuntu` in these scripts.
+  - Do **not** add shebangs or duplicate `set -euo pipefail`/`ensure_os` in these scripts.
 - Use helpers from `lib/common.sh`:
   - `sudo_run ...`, `log ...`, `die ...`, `fetch_url ...` (curl/wget agnostic).
 
 ## Folder conventions
 
-- Always run: `req/`, `pre/`
-- Tags: `<tag>/`
-- Optional scripts: `<tag>/optional/`
+- Always run: `<os>/req/`, `<os>/pre/`
+- Tags: `<os>/<tag>/`
+- Optional scripts: `<os>/<tag>/optional/`
   - `-o/--optional` installs optional scripts for selected tags
   - `--<tag>-optional` installs all optional scripts for that tag
   - `--<tag>--<script>` installs only `<tag>/optional/<script>.sh`

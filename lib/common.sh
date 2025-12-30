@@ -3,12 +3,12 @@ set -euo pipefail
 
 log() {
   # shellcheck disable=SC2059
-  printf "[os-ubuntu] %s\n" "$*"
+  printf "[loadout] %s\n" "$*"
 }
 
 warn() {
   # shellcheck disable=SC2059
-  printf "[os-ubuntu] WARN: %s\n" "$*" >&2
+  printf "[loadout] WARN: %s\n" "$*" >&2
 }
 
 die() {
@@ -47,29 +47,6 @@ sudo_run() {
     run "$@"
   else
     run sudo "$@"
-  fi
-}
-
-ensure_ubuntu() {
-  if [[ ! -f /etc/os-release ]]; then
-    die "Cannot detect OS (missing /etc/os-release)."
-  fi
-  # shellcheck disable=SC1091
-  . /etc/os-release
-  if [[ "${ID:-}" != "ubuntu" ]]; then
-    die "This installer currently supports Ubuntu only (detected: ${ID:-unknown})."
-  fi
-}
-
-apt_recover_dpkg() {
-  # In some environments dpkg can be left half-configured (e.g. interrupted upgrade),
-  # which blocks any apt operation with:
-  #   "E: dpkg was interrupted, you must manually run 'sudo dpkg --configure -a' ..."
-  #
-  # Running this proactively is safe when dpkg is healthy (it's effectively a no-op).
-  log "Ensuring dpkg is configured (dpkg --configure -a)..."
-  if ! sudo_run dpkg --configure -a; then
-    die "dpkg is in a broken state. Try: sudo dpkg --configure -a && sudo apt-get -f install"
   fi
 }
 

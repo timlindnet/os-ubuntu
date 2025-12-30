@@ -1,11 +1,11 @@
-# Cursor rules for this repo (os-ubuntu)
+# Cursor rules for this repo (loadout)
 
 ## Primary goal
-Keep this repo **KISS**: minimal, stable, low-maintenance bash automation for Ubuntu 24+.
+Keep this repo **KISS**: minimal, stable, low-maintenance bash automation (starting with Ubuntu 24+).
 
 ## Script conventions
-- Scripts in `req/`, `pre/`, `<tag>/`, and `<tag>/optional/` are **snippets**.
-  - They MUST NOT include boilerplate like `#!/usr/bin/env bash`, `set -euo pipefail`, `source lib/common.sh`, or `ensure_ubuntu`.
+- Scripts in `<os>/req/`, `<os>/pre/`, `<os>/<tag>/`, and `<os>/<tag>/optional/` are **snippets**.
+ - They MUST NOT include boilerplate like `#!/usr/bin/env bash`, `set -euo pipefail`, `source lib/common.sh`, or `ensure_os`.
   - They are executed via `lib/run-script.sh`, which applies strict mode and loads shared helpers.
 - Prefer using helpers from `lib/common.sh`:
   - `sudo_run`, `log`, `die`, `fetch_url` (curl/wget agnostic).
@@ -17,6 +17,6 @@ Keep this repo **KISS**: minimal, stable, low-maintenance bash automation for Ub
 - Minimize new dependencies and avoid “install both curl and wget”.
 
 ## Optional scripts
-- Optional scripts live under `<tag>/optional/` and are installed only via:
+- Optional scripts live under `<os>/<tag>/optional/` and are installed only via:
   - `-o/--optional` (for selected tags), `--<tag>-optional`, or `--<tag>--<script>`.
 

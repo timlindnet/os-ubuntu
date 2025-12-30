@@ -8,17 +8,35 @@ fi
 
 SCRIPT_PATH="$1"
 
-# Prefer OS_UBUNTU_ROOT set by the runner; otherwise resolve relative to script.
-if [[ -n "${OS_UBUNTU_ROOT:-}" ]]; then
-  ROOT="$OS_UBUNTU_ROOT"
-else
-  ROOT="$(cd "$(dirname "$SCRIPT_PATH")/.." && pwd)"
+# Prefer OS root set by the runner; otherwise resolve from script path.
+SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
+
+OS_ROOT="${LOADOUT_OS_ROOT:-${OS_UBUNTU_ROOT:-}}"
+if [[ -z "$OS_ROOT" ]]; then
+  case "$(basename "$SCRIPT_DIR")" in
+    optional|explicit)
+      OS_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+      ;;
+    *)
+      OS_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+      ;;
+  esac
 fi
 
-# shellcheck source=lib/common.sh
-source "$ROOT/lib/common.sh"
+REPO_ROOT="${LOADOUT_REPO_ROOT:-}"
+if [[ -z "$REPO_ROOT" ]]; then
+  REPO_ROOT="$(cd "$OS_ROOT/.." && pwd)"
+fi
 
-ensure_ubuntu
+# Shared helpers.
+# shellcheck source=lib/common.sh
+source "$REPO_ROOT/lib/common.sh"
+
+# OS-specific helpers.
+# shellcheck disable=SC1090
+source "$OS_ROOT/lib/os.sh"
+
+ensure_os
 
 # Execute script body in this shell (scripts are snippets, not standalone executables).
 # shellcheck disable=SC1090

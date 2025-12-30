@@ -18,14 +18,15 @@ declare -A SELECT_ONLY=()
 
 print_help() {
   cat <<'EOF'
-os-ubuntu: folder-driven Ubuntu setup (bash)
+loadout: folder-driven OS setup (bash)
 
 Usage:
-  ./install.sh [--base] [--dev] [--gaming] ...
-  ./install.sh --all
-  ./install.sh --gaming -o
-  ./install.sh --base--spotify
-  ./install.sh --games--rs3
+  # Per-OS local usage (OS is implied by the script path):
+  ./ubuntu/install.sh [--base] [--dev] [--gaming] ...
+  ./ubuntu/install.sh --all
+  ./ubuntu/install.sh --gaming -o
+  ./ubuntu/install.sh --base--spotify
+  ./ubuntu/install.sh --games--rs3
 
 Modes:
   --help                  Show help
@@ -38,7 +39,7 @@ Snapshots (stored as commits in ./state):
   --apply-snapshot <ref>  Apply snapshot by git ref (commit SHA, tag, etc.)
 
 Notes:
-  - Always-run folders: req/, pre/
+  - Always-run folders (relative to the OS root): req/, pre/
   - Tag folders run only when selected: base/, dev/, gaming/, ...
   - Optional scripts live under <tag>/optional/
     - Install all optional scripts for a tag: --<tag>-optional

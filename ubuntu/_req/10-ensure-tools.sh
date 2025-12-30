@@ -24,5 +24,5 @@ if [[ ${#need[@]} -eq 0 ]]; then
 fi
 
 log "Installing bootstrap tools: ${need[*]}"
-os_pkg_install "${need[@]}"
+os_apt_install "${need[@]}"
 

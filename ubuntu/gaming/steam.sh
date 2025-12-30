@@ -1,7 +1,7 @@
 log "Installing Steam (apt)..."
 
 # Fast path: if Steam is already installed, don't touch apt sources.
-if os_pkg_is_installed steam; then
+if os_apt_is_installed steam; then
   log "Steam already installed."
   exit 0
 fi
@@ -11,7 +11,7 @@ fi
 # enabling multiverse.
 if ! have_cmd add-apt-repository; then
   # add-apt-repository is provided by software-properties-common.
-  os_pkg_install software-properties-common
+  os_apt_install software-properties-common
 fi
 
 if ! grep -RqsE '^[^#].*\bmultiverse\b' /etc/apt/sources.list /etc/apt/sources.list.d 2>/dev/null; then
@@ -19,7 +19,7 @@ if ! grep -RqsE '^[^#].*\bmultiverse\b' /etc/apt/sources.list /etc/apt/sources.l
   sudo_run apt-get update -y
 fi
 
-os_pkg_install steam
+os_apt_install steam
 
 log "Done (Steam)."
 

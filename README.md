@@ -68,7 +68,9 @@ Optional scripts live under `<os>/<tag>/optional/`.
 ./install.sh ubuntu --dev--cursor
 ```
 
-- Explicit scripts live under `<tag>/explicit/` and are installed only when you name them:
+## Explicit scripts
+
+Explicit scripts live under `<os>/<tag>/explicit/` and are installed only when you name them (they are never installed via `-o/--optional`).
 
 ```bash
 ./install.sh ubuntu --games--rs3

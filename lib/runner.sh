@@ -110,6 +110,58 @@ run_selected_for_tag() {
 
   log "Running selected scripts for tag: $tag/ ($spec)"
 
+  resolve_selected_script_path() {
+    # Usage: resolve_selected_script_path <dir> <selector_base>
+    #
+    # Resolves a selector like "ssh-config" to:
+    # - <dir>/ssh-config.sh (exact), OR
+    # - <dir>/NN-ssh-config.sh (two-digit order prefix), OR
+    # - <dir>/NNN-ssh-config.sh (best-effort: numeric prefix)
+    #
+    # If multiple matches exist, returns failure.
+    local dir="$1"
+    local selector="$2"
+
+    local exact="$dir/$selector.sh"
+    if [[ -f "$exact" ]]; then
+      printf "%s" "$exact"
+      return 0
+    fi
+
+    local matches=()
+    local f
+    for f in "$dir"/*.sh; do
+      [[ -f "$f" ]] || continue
+      local name
+      name="$(basename "$f")"
+      local stem="${name%.sh}"
+
+      # Strip common numeric ordering prefixes.
+      # Primary: NN-foo
+      local stripped="$stem"
+      if [[ "$stripped" =~ ^[0-9][0-9]- ]]; then
+        stripped="${stripped:3}"
+      elif [[ "$stripped" =~ ^[0-9]+- ]]; then
+        # Best-effort fallback (e.g. 100-foo)
+        stripped="${stripped#*-}"
+      fi
+
+      if [[ "$stripped" == "$selector" ]]; then
+        matches+=("$f")
+      fi
+    done
+
+    if [[ ${#matches[@]} -eq 1 ]]; then
+      printf "%s" "${matches[0]}"
+      return 0
+    fi
+    if [[ ${#matches[@]} -gt 1 ]]; then
+      die "Selector '$tag--$selector' is ambiguous; matches: ${matches[*]}"
+    fi
+
+    return 1
+  }
+
   local s
   for s in $spec; do
     local base="$s"
@@ -117,19 +169,26 @@ run_selected_for_tag() {
       base="${base%.sh}"
     fi
 
-    local explicit="$os_root/$tag/explicit/$base.sh"
-    local optional="$os_root/$tag/optional/$base.sh"
-
     local file=""
     local label=""
-    if [[ -f "$explicit" ]]; then
-      file="$explicit"
-      label="$tag/explicit"
-    elif [[ -f "$optional" ]]; then
-      file="$optional"
-      label="$tag/optional"
-    else
-      die "Selected script not found for tag '$tag': expected $explicit or $optional"
+    local explicit_dir="$os_root/$tag/explicit"
+    local optional_dir="$os_root/$tag/optional"
+
+    if [[ -d "$explicit_dir" ]]; then
+      file="$(resolve_selected_script_path "$explicit_dir" "$base" || true)"
+      if [[ -n "$file" ]]; then
+        label="$tag/explicit"
+      fi
+    fi
+    if [[ -z "$file" && -d "$optional_dir" ]]; then
+      file="$(resolve_selected_script_path "$optional_dir" "$base" || true)"
+      if [[ -n "$file" ]]; then
+        label="$tag/optional"
+      fi
+    fi
+
+    if [[ -z "$file" ]]; then
+      die "Selected script not found for tag '$tag': $base (looked in: $explicit_dir, $optional_dir)"
     fi
 
     log "Running: $label/$(basename "$file")"

@@ -23,8 +23,16 @@ if [[ ! -s "$NVM_DIR/nvm.sh" ]]; then
 fi
 # shellcheck disable=SC1091
 source "$NVM_DIR/nvm.sh"
-nvm install --lts
-nvm alias default 'lts/*'
+
+# Only hit the network if there is no LTS installed yet.
+if nvm ls --no-colors --lts 2>/dev/null | grep -qE '\bv[0-9]+'; then
+  :
+else
+  nvm install --lts
+fi
+
+# Keep it fast/idempotent: setting the alias is local-only.
+nvm alias default 'lts/*' >/dev/null
 EOF
 )
 

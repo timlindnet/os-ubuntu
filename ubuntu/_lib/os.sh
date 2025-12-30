@@ -42,13 +42,60 @@ os_pkg_upgrade() {
     -o Dpkg::Options::=--force-confold
 }
 
+os_pkg_is_installed() {
+  # Usage: os_pkg_is_installed <apt-package-name>
+  #
+  # Returns 0 if the package is installed (per dpkg), otherwise 1.
+  local pkg="$1"
+  dpkg -s "$pkg" >/dev/null 2>&1
+}
+
 os_pkg_install() {
   local pkgs=("$@")
   if [[ ${#pkgs[@]} -eq 0 ]]; then
     return 0
   fi
+
+  local missing=()
+  local p
+  for p in "${pkgs[@]}"; do
+    if os_pkg_is_installed "$p"; then
+      :
+    else
+      missing+=("$p")
+    fi
+  done
+
+  if [[ ${#missing[@]} -eq 0 ]]; then
+    log "All requested apt packages already installed: ${pkgs[*]}"
+    return 0
+  fi
+
+  log "Installing apt packages: ${missing[*]}"
   os_pkg_update
-  sudo_run apt-get install -y "${pkgs[@]}"
+  sudo_run apt-get install -y "${missing[@]}"
+}
+
+os_snap_is_installed() {
+  # Usage: os_snap_is_installed <snap-name>
+  have_cmd snap || return 1
+  snap list "$1" >/dev/null 2>&1
+}
+
+os_snap_install() {
+  # Usage: os_snap_install <snap-name> [--classic]
+  #
+  # Installs a snap only if not already installed.
+  local name="$1"
+  shift || true
+
+  if os_snap_is_installed "$name"; then
+    log "Snap already installed: $name"
+    return 0
+  fi
+
+  log "Installing snap: $name"
+  sudo_run snap install "$name" "$@"
 }
 
 # Back-compat with existing Ubuntu scripts.

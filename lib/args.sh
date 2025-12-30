@@ -18,7 +18,7 @@ print_help() {
 loadout: folder-driven OS setup (bash)
 
 Usage:
-  loadout ubuntu --base --dev --gaming
+  loadout --base --dev --gaming
   wget -qO-  https://loadout.timlind.net | bash -s -- ubuntu --base --dev --gaming
   curl -fsSL https://loadout.timlind.net | bash -s -- ubuntu --base --dev --gaming
 

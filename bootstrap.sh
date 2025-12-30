@@ -15,6 +15,15 @@ die() { printf "[loadout-bootstrap] ERROR: %s\n" "$*" >&2; exit 1; }
 
 have_cmd() { command -v "$1" >/dev/null 2>&1; }
 
+sudo_run() {
+  if [[ "${EUID:-$(id -u)}" -eq 0 ]]; then
+    "$@"
+  else
+    have_cmd sudo || die "sudo is required for: $*"
+    sudo "$@"
+  fi
+}
+
 choose_fetcher() {
   local pref="${LOADOUT_FETCHER:-}"
   if [[ -n "$pref" ]]; then
@@ -59,9 +68,9 @@ install_loadout_helper() {
   fi
   [[ -n "$target_home" ]] || die "Cannot resolve target home directory."
 
-  local bin_dir="$target_home/.local/bin"
+  # Config is per-user even if the helper is installed system-wide.
   local cfg_dir="$target_home/.config/loadout"
-  mkdir -p "$bin_dir" "$cfg_dir"
+  mkdir -p "$cfg_dir"
 
   local cfg_file="$cfg_dir/bootstrap.env"
   cat >"$cfg_file" <<EOF
@@ -71,8 +80,28 @@ LOADOUT_FETCHER_DEFAULT=${fetcher}
 LOADOUT_DEFAULT_OS=${default_os}
 EOF
 
-  local helper="$bin_dir/loadout"
-  cat >"$helper" <<'EOF'
+  # If we’re running as root (or via sudo), ensure the target user can read/write config.
+  if [[ "${EUID:-$(id -u)}" -eq 0 && -n "$target_user" && "$target_user" != "root" ]]; then
+    chown -R "$target_user":"$target_user" "$cfg_dir" 2>/dev/null || true
+  fi
+
+  # Install helper where it's immediately discoverable on PATH.
+  local helper_dir=""
+  if [[ -w /usr/local/bin ]]; then
+    helper_dir="/usr/local/bin"
+  else
+    # Try /usr/local/bin via sudo, fall back to ~/.local/bin.
+    if have_cmd sudo; then
+      helper_dir="/usr/local/bin"
+    else
+      helper_dir="$target_home/.local/bin"
+      mkdir -p "$helper_dir"
+    fi
+  fi
+
+  local tmp_helper
+  tmp_helper="$(mktemp)"
+  cat >"$tmp_helper" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
 
@@ -115,9 +144,22 @@ case "$fetcher" in
   *) die "Unknown fetcher: $fetcher" ;;
 esac
 EOF
-  chmod +x "$helper"
+  chmod +x "$tmp_helper"
+
+  local helper="$helper_dir/loadout"
+  if [[ "$helper_dir" == "/usr/local/bin" && ! -w /usr/local/bin ]]; then
+    # Needs sudo to place in /usr/local/bin.
+    sudo_run install -m 0755 "$tmp_helper" "$helper"
+  else
+    install -m 0755 "$tmp_helper" "$helper"
+  fi
+  rm -f "$tmp_helper"
 
   log "Installed helper: $helper"
+  if [[ ":${PATH:-}:" != *":$helper_dir:"* ]]; then
+    log "NOTE: '$helper_dir' is not on PATH in this shell."
+    log "      Start a new shell, or run: export PATH=\"$helper_dir:\$PATH\""
+  fi
   log "Run: loadout --dev --gaming"
 }
 

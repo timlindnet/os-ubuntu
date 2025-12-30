@@ -26,15 +26,20 @@ trap 'rm -f "$tmp"' RETURN
 
 fetch_url "$url" >"$tmp"
 
+# Cursor's postinst may prompt to add its apt repository; answer "yes" up front.
+if have_cmd debconf-set-selections; then
+  sudo_run sh -c 'printf "%s\n" "cursor cursor/add-cursor-repo boolean true" | debconf-set-selections'
+fi
+
 # Prefer apt installing local deb (pulls dependencies). Fallback to dpkg if needed.
 apt_recover_dpkg
-if sudo_run apt-get install -y "$tmp"; then
+if sudo_run env DEBIAN_FRONTEND=noninteractive apt-get install -y "$tmp"; then
   :
 else
   warn "apt-get install of local .deb failed; trying dpkg + fix deps"
   sudo_run dpkg -i "$tmp" || true
   apt_recover_dpkg
-  sudo_run apt-get -f install -y
+  sudo_run env DEBIAN_FRONTEND=noninteractive apt-get -f install -y
 fi
 
 log "Done (Cursor)."

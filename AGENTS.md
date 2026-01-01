@@ -1,6 +1,6 @@
 # Agent guide (AGENTS.md)
 
-This repo is **loadout**: simple, folder-driven **bash automation** for setting up a machine (starting with **Ubuntu 24+** and Debian-family layering).
+This repo is **loadout**: simple, tag-based **bash automation** for one-line machine setup (starting with **Ubuntu 24+** and Debian-family layering).
 
 If you are an automated coding agent, follow this guide to make changes that match the repo’s conventions and stay low-maintenance.
 

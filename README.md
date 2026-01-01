@@ -1,6 +1,8 @@
-# loadout (bash-based multi-OS setup)
+# loadout (one-line OS setup, in bash)
 
-Folder-driven installer for fresh OS installs (starting with Debian-family distros like **Ubuntu**), with optional tags (e.g. `--dev`, `--gaming`).
+Pick the tags (apps + setup) you want and install them in one go (starting with Debian-family distros like **Ubuntu**): `--dev`, `--gaming`, etc.
+
+Implementation detail: tags map to folders under `_tags/` (e.g. `_tags/dev/`, `_tags/gaming/`).
 
 ## One-liner usage
 

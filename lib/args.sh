@@ -15,7 +15,7 @@ declare -A SELECT_ONLY=()
 
 print_help() {
   cat <<'EOF'
-loadout: folder-driven OS setup (bash)
+loadout: one-line OS setup (bash)
 
 Usage:
   loadout --base --dev --gaming

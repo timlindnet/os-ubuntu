@@ -81,6 +81,7 @@ Explicit scripts live under `_tags/<tag>/explicit/` and are installed only when 
 
 ```bash
 loadout --games--rs3
+loadout --dev--aws-cli
 ```
 
 ## Folder execution model

@@ -121,6 +121,106 @@ loadout_list_all_tags() {
   printf "%s\n" "${out[@]}" | sort
 }
 
+loadout_strip_order_prefix() {
+  # Usage: loadout_strip_order_prefix <stem>
+  #
+  # Strips common numeric ordering prefixes from a script stem:
+  # - NN-foo -> foo
+  # - NNN-foo (best-effort) -> foo
+  local stem="$1"
+  if [[ "$stem" =~ ^[0-9][0-9]- ]]; then
+    printf "%s" "${stem:3}"
+  elif [[ "$stem" =~ ^[0-9]+- ]]; then
+    printf "%s" "${stem#*-}"
+  else
+    printf "%s" "$stem"
+  fi
+}
+
+loadout_layered_list_selectors() {
+  # Usage: loadout_layered_list_selectors <rel-folder>
+  #
+  # Prints selector bases (one per line), merged across layers.
+  local rel="$1"
+  loadout_layered_list_scripts "$rel"
+
+  local selectors=()
+  local f
+  for f in "${LOADOUT_LAYERED_SCRIPTS_ARR[@]}"; do
+    local name
+    name="$(basename "$f")"
+    local stem="${name%.sh}"
+    selectors+=("$(loadout_strip_order_prefix "$stem")")
+  done
+
+  if [[ ${#selectors[@]} -eq 0 ]]; then
+    return 0
+  fi
+
+  printf "%s\n" "${selectors[@]}" | sort -u
+}
+
+loadout_print_wrapped_kv_list() {
+  # Usage: loadout_print_wrapped_kv_list <indent> <key> [values...]
+  #
+  # Prints a readable, wrapped "key: v1 v2 ..." list.
+  local indent="$1"
+  local key="$2"
+  shift 2
+
+  local width="${COLUMNS:-80}"
+  local prefix="${indent}${key}: "
+  local cont_prefix
+  cont_prefix="$(printf "%*s" "${#prefix}" "")"
+
+  if [[ $# -eq 0 ]]; then
+    printf "%s%s\n" "$prefix" "(none)"
+    return 0
+  fi
+
+  local line="$prefix"
+  local w
+  for w in "$@"; do
+    if [[ "$line" == "$prefix" ]]; then
+      line+="$w"
+      continue
+    fi
+    if (( ${#line} + 1 + ${#w} > width )); then
+      printf "%s\n" "$line"
+      line="${cont_prefix}${w}"
+    else
+      line+=" $w"
+    fi
+  done
+  printf "%s\n" "$line"
+}
+
+loadout_print_tag_catalog() {
+  # Usage: loadout_print_tag_catalog
+  #
+  # Human-readable tag listing for --list-tags.
+  local tags=()
+  mapfile -t tags < <(loadout_list_all_tags)
+  if [[ ${#tags[@]} -eq 0 ]]; then
+    return 0
+  fi
+
+  local tag
+  for tag in "${tags[@]}"; do
+    printf "%s\n" "$tag"
+
+    local optional=()
+    mapfile -t optional < <(loadout_layered_list_selectors "_tags/$tag/optional" || true)
+    loadout_print_wrapped_kv_list "  " "optional" "${optional[@]}"
+
+    local explicit=()
+    mapfile -t explicit < <(loadout_layered_list_selectors "_tags/$tag/explicit" || true)
+    loadout_print_wrapped_kv_list "  " "explicit" "${explicit[@]}"
+
+    printf "\n"
+  done
+}
+
 loadout_resolve_selected_script_path() {
   # Usage: loadout_resolve_selected_script_path <dir> <selector_base>
   #

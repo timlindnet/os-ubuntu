@@ -52,7 +52,7 @@ loadout --all-tags
 loadout --all-tags -o
 ```
 
-## Optional scripts
+### Optional scripts
 
 Optional scripts live under `_tags/<tag>/optional/`.
 
@@ -75,7 +75,7 @@ loadout --gaming-optional
 loadout --dev--cursor
 ```
 
-## Explicit scripts
+### Explicit scripts
 
 Explicit scripts live under `_tags/<tag>/explicit/` and are installed only when you name them (they are never installed via `-o/--optional`).
 

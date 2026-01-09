@@ -227,7 +227,7 @@ loadout_layered_list_display_names() {
 loadout_print_wrapped_kv_list() {
   # Usage: loadout_print_wrapped_kv_list <indent> <key> [values...]
   #
-  # Prints a readable, wrapped "key: v1 v2 ..." list.
+  # Prints a readable, wrapped "key: v1, v2, ..." list.
   local indent="$1"
   local key="$2"
   shift 2
@@ -242,9 +242,22 @@ loadout_print_wrapped_kv_list() {
     return 0
   fi
 
+  # Build comma-separated tokens with commas attached, so wrapping doesn't
+  # lose separators.
+  local values=("$@")
+  local tokens=()
+  local i
+  for ((i=0; i<${#values[@]}; i++)); do
+    if (( i < ${#values[@]} - 1 )); then
+      tokens+=("${values[$i]},")
+    else
+      tokens+=("${values[$i]}")
+    fi
+  done
+
   local line="$prefix"
   local w
-  for w in "$@"; do
+  for w in "${tokens[@]}"; do
     if [[ "$line" == "$prefix" ]]; then
       line+="$w"
       continue

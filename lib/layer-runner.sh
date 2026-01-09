@@ -160,10 +160,74 @@ loadout_layered_list_selectors() {
   printf "%s\n" "${selectors[@]}" | sort -u
 }
 
+loadout_selector_display_name_from_file() {
+  # Usage: loadout_selector_display_name_from_file <selector> <file-path>
+  #
+  # Allows nicer human-readable names for some scripts.
+  local selector="$1"
+  local file="$2"
+
+  # Convention: show node installed via nvm as "node (nvm)".
+  if [[ "$selector" == "node" ]]; then
+    if grep -qi "nvm" "$file" 2>/dev/null; then
+      printf "%s" "node (nvm)"
+      return 0
+    fi
+  fi
+
+  printf "%s" "$selector"
+}
+
+loadout_layered_list_display_names() {
+  # Usage: loadout_layered_list_display_names <rel-folder>
+  #
+  # Prints human-readable display names (one per line), merged across layers.
+  # Keeps stable ordering by selector base.
+  local rel="$1"
+  loadout_layered_list_scripts "$rel"
+
+  declare -A by_selector=()
+  local f
+  for f in "${LOADOUT_LAYERED_SCRIPTS_ARR[@]}"; do
+    local name
+    name="$(basename "$f")"
+    local stem="${name%.sh}"
+    local selector
+    selector="$(loadout_strip_order_prefix "$stem")"
+    local display
+    display="$(loadout_selector_display_name_from_file "$selector" "$f")"
+
+    # If multiple layers provide the same selector, prefer the more descriptive name.
+    if [[ -z "${by_selector[$selector]:-}" ]]; then
+      by_selector["$selector"]="$display"
+    else
+      if [[ "${by_selector[$selector]}" == "$selector" && "$display" != "$selector" ]]; then
+        by_selector["$selector"]="$display"
+      fi
+    fi
+  done
+
+  local keys=()
+  local k
+  for k in "${!by_selector[@]}"; do
+    keys+=("$k")
+  done
+  if [[ ${#keys[@]} -eq 0 ]]; then
+    return 0
+  fi
+  mapfile -t keys < <(printf "%s\n" "${keys[@]}" | sort)
+
+  local out=()
+  for k in "${keys[@]}"; do
+    out+=("${by_selector[$k]}")
+  done
+  printf "%s\n" "${out[@]}"
+}
+
 loadout_print_wrapped_kv_list() {
   # Usage: loadout_print_wrapped_kv_list <indent> <key> [values...]
   #
-  # Prints a readable, wrapped "key: v1 v2 ..." list.
+  # Prints a readable, wrapped "key: v1, v2, ..." list.
   local indent="$1"
   local key="$2"
   shift 2
@@ -178,9 +242,22 @@ loadout_print_wrapped_kv_list() {
     return 0
   fi
 
+  # Build comma-separated tokens with commas attached, so wrapping doesn't
+  # lose separators.
+  local values=("$@")
+  local tokens=()
+  local i
+  for ((i=0; i<${#values[@]}; i++)); do
+    if (( i < ${#values[@]} - 1 )); then
+      tokens+=("${values[$i]},")
+    else
+      tokens+=("${values[$i]}")
+    fi
+  done
+
   local line="$prefix"
   local w
-  for w in "$@"; do
+  for w in "${tokens[@]}"; do
     if [[ "$line" == "$prefix" ]]; then
       line+="$w"
       continue
@@ -208,6 +285,10 @@ loadout_print_tag_catalog() {
   local tag
   for tag in "${tags[@]}"; do
     printf "%s\n" "$tag"
+
+    local defaults=()
+    mapfile -t defaults < <(loadout_layered_list_display_names "_tags/$tag" || true)
+    loadout_print_wrapped_kv_list "  " "default" "${defaults[@]}"
 
     local optional=()
     mapfile -t optional < <(loadout_layered_list_selectors "_tags/$tag/optional" || true)

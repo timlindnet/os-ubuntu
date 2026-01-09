@@ -24,7 +24,7 @@ Usage:
 
 Modes:
   --help                  Show help
-  --list-tags             List available tag folders
+  --list-tags             List tags (default/optional/explicit scripts)
 
 Notes:
   - Always-run folders: _req/, _pre/

@@ -30,7 +30,7 @@ main() {
       return 0
       ;;
     list_tags)
-      loadout_list_all_tags
+      loadout_print_tag_catalog
       return 0
       ;;
     install)

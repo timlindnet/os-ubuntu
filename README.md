@@ -25,7 +25,6 @@ wget -qO- https://raw.githubusercontent.com/timlindnet/loadout/main/bootstrap.sh
 ```
 
 > Note: if you want to pass arguments to a script read from stdin, you need `bash -s -- ...`.
-> Note: plain `wget https://... | bash` will not work because wget writes to a file. Use `wget -qO- ... | bash`.
 
 The bootstrap also installs a helper command so you can later run:
 

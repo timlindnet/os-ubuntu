@@ -39,7 +39,9 @@ Notes:
       - To also run optional scripts: --all-tags -o
   - Explicit scripts live under _tags/<tag>/explicit/
     - They are only installed via --<tag>--<script> (never via -o/--optional)
-  - For stdin piping (wget/curl): bash -s -- <args>
+  - For stdin piping (wget/curl):
+    - wget must use -qO- to stream to bash
+    - pass args with: bash -s -- <args>
 EOF
 }
 
@@ -95,7 +97,14 @@ parse_args() {
         fi
         ;;
       *)
-        die "Unknown argument: $a (note: OS argument is no longer used; pass tags as --dev/--gaming etc)"
+        case "$a" in
+          ubuntu|debian|fedora|arch|linux)
+            warn "Ignoring deprecated OS argument: $a (pass tags as --dev/--gaming etc)"
+            ;;
+          *)
+            die "Unknown argument: $a (note: OS argument is no longer used; pass tags as --dev/--gaming etc)"
+            ;;
+        esac
         ;;
     esac
     i=$((i+1))

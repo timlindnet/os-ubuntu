@@ -84,17 +84,36 @@ EOF
   fi
 
   # Install helper where it's immediately discoverable on PATH.
+  local existing_helper=""
   local helper_dir=""
-  if [[ -w /usr/local/bin ]]; then
-    helper_dir="/usr/local/bin"
-  else
-    # Try /usr/local/bin via sudo, fall back to ~/.local/bin.
-    if have_cmd sudo; then
+  existing_helper="$(type -p loadout 2>/dev/null || true)"
+  if [[ -n "$existing_helper" && -x "$existing_helper" ]]; then
+    case "$(dirname "$existing_helper")" in
+      "$target_home/.local/bin"|/usr/local/bin)
+        helper_dir="$(dirname "$existing_helper")"
+        ;;
+    esac
+  fi
+
+  if [[ -z "$helper_dir" ]]; then
+    if [[ -w /usr/local/bin ]]; then
       helper_dir="/usr/local/bin"
     else
-      helper_dir="$target_home/.local/bin"
-      mkdir -p "$helper_dir"
+      # Try /usr/local/bin via sudo, fall back to ~/.local/bin.
+      if have_cmd sudo; then
+        helper_dir="/usr/local/bin"
+      else
+        helper_dir="$target_home/.local/bin"
+      fi
     fi
+  fi
+
+  if [[ "$helper_dir" == "/usr/local/bin" && ! -w /usr/local/bin ]] && ! have_cmd sudo; then
+    helper_dir="$target_home/.local/bin"
+  fi
+
+  if [[ "$helper_dir" == "$target_home/.local/bin" ]]; then
+    mkdir -p "$helper_dir"
   fi
 
   local tmp_helper
@@ -146,6 +165,10 @@ EOF
   rm -f "$tmp_helper"
 
   log "Installed helper: $helper"
+  if [[ -n "$existing_helper" && "$existing_helper" != "$helper" ]]; then
+    log "NOTE: Another loadout helper exists at $existing_helper"
+    log "      Remove it or run: hash -r to refresh your shell."
+  fi
   if [[ ":${PATH:-}:" != *":$helper_dir:"* ]]; then
     log "NOTE: '$helper_dir' is not on PATH in this shell."
     log "      Start a new shell, or run: export PATH=\"$helper_dir:\$PATH\""

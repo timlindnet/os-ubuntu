@@ -6,6 +6,14 @@ Implementation detail: tags map to folders under `_tags/` (e.g. `_tags/dev/`, `_
 
 ## One-liner usage
 
+Base only (default):
+
+```bash
+wget -qO- https://loadout.timlind.net | bash
+```
+
+With tags:
+
 ```bash
 wget -qO- https://loadout.timlind.net | bash -s -- --base --dev --gaming --optional
 ```

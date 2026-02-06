@@ -6,25 +6,33 @@ Implementation detail: tags map to folders under `_tags/` (e.g. `_tags/dev/`, `_
 
 ## One-liner usage
 
+Base only (default):
+
 ```bash
-curl -fsSL https://loadout.timlind.net | bash -s -- --base --dev --gaming --optional
+wget -qO- https://loadout.timlind.net | bash
 ```
+
+With tags:
 
 ```bash
 wget -qO- https://loadout.timlind.net | bash -s -- --base --dev --gaming --optional
 ```
 
-If you prefer to bypass `loadout.timlind.net`, you can use GitHub directly:
+If you already have `curl`:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/timlindnet/loadout/main/bootstrap.sh | bash -s -- --base --dev --gaming --optional
+curl -fsSL https://loadout.timlind.net | bash -s -- --base --dev --gaming --optional
 ```
+
+If you prefer to bypass `loadout.timlind.net`, you can use GitHub directly:
 
 ```bash
 wget -qO- https://raw.githubusercontent.com/timlindnet/loadout/main/bootstrap.sh | bash -s -- --base --dev --gaming --optional
 ```
 
-> Note: if you want to pass arguments to a script read from stdin, you need `bash -s -- ...`.
+```bash
+curl -fsSL https://raw.githubusercontent.com/timlindnet/loadout/main/bootstrap.sh | bash -s -- --base --dev --gaming --optional
+```
 
 The bootstrap also installs a helper command so you can later run:
 
@@ -32,55 +40,41 @@ The bootstrap also installs a helper command so you can later run:
 loadout --dev --gaming
 ```
 
-## Tags
+## CLI quick reference (matches --help)
+
+Modes:
+- `loadout --help` (show help)
+- `loadout --list-tags` (list tags and available add-ons)
+
+Notes:
+- Default tag: `--base` (when no tags are given)
+- See what you can install: `loadout --list-tags`
+- Install tags by name: `loadout --base --dev --gaming`
+- Install all tags: `loadout --all-tags`
+  - Include optional add-ons too: `loadout --all-tags -o`
+- Include optional add-ons for selected tags: `loadout --dev -o`
+- Install all add-ons for one tag: `loadout --dev-optional`
+- Run a single add-on by name: `loadout --dev--cursor`
+  - Names for add-ons are shown under `optional/` and `explicit/` in `loadout --list-tags`
+
+## Tags and add-ons
 
 Tags correspond to folders under `_tags/` (e.g. `_tags/base/`, `_tags/dev/`, `_tags/gaming/`) and are installed only when selected.
 
-- **Purpose**: keep installs modular. You choose *what kind of machine* you’re setting up by selecting tags.
-- **`base`**: OS-level “foundation” changes meant to improve stability/security (packages, system settings, prerequisites). It should avoid app-specific installs.
+- **Purpose**: keep installs modular. You choose *what kind of machine* you're setting up by selecting tags.
+- **`base`**: OS-level "foundation" changes meant to improve stability/security (packages, system settings, prerequisites). It should avoid app-specific installs.
 - **Naming**: folders prefixed with `_` (e.g. `_lib/`, `_pre/`, `_req/`) are internal and **cannot** be targeted as tags.
 
-- Install every tag folder:
+Add-ons live under `_tags/<tag>/optional/` and `_tags/<tag>/explicit/`.
 
-```bash
-loadout --all-tags
-```
+- **Optional** add-ons run with `-o/--optional` or `--<tag>-optional`.
+- **Explicit** add-ons run only when named (`--<tag>--<script>`), and are never installed via `-o/--optional`.
+- If both exist for the same name, `explicit/` is preferred over `optional/`.
 
-- Install every tag folder + optional scripts:
-
-```bash
-loadout --all-tags -o
-```
-
-### Optional scripts
-
-Optional scripts live under `_tags/<tag>/optional/`.
-
-- Install optional scripts for the tags you selected:
-
-```bash
-loadout --base --gaming -o
-```
-
-- Install all optional scripts for a specific tag:
-
-```bash
-loadout --base-optional
-loadout --gaming-optional
-```
-
-- Install only one optional script for a tag (maps to `_tags/<tag>/optional/<script>.sh`):
+Examples:
 
 ```bash
 loadout --dev--cursor
-```
-
-### Explicit scripts
-
-Explicit scripts live under `_tags/<tag>/explicit/` and are installed only when you name them (they are never installed via `-o/--optional`).
-
-```bash
-loadout --games--rs3
 loadout --dev--aws-cli
 ```
 

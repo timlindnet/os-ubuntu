@@ -19,7 +19,7 @@ loadout: one-line OS setup (bash)
 
 Usage:
   loadout --base --dev --gaming
-  wget -qO-  https://loadout.timlind.net | bash -s -- --base --dev --gaming
+  wget -qO- https://loadout.timlind.net | bash -s -- --base --dev --gaming
   curl -fsSL https://loadout.timlind.net | bash -s -- --base --dev --gaming
 
 Modes:
@@ -27,14 +27,14 @@ Modes:
   --list-tags             List tags and available add-ons
 
 Notes:
+  - Default tag: --base (when no tags are given)
   - See what you can install: loadout --list-tags
   - Install tags by name: loadout --base --dev --gaming
-    - If you pass no tags, it defaults to: --base
   - Install all tags: loadout --all-tags
     - Include optional add-ons too: loadout --all-tags -o
   - Include optional add-ons for selected tags: loadout --dev -o
   - Install all add-ons for one tag: loadout --dev-optional
-  - Run a single add-on by name: loadout --dev--docker
+  - Run a single add-on by name: loadout --dev--cursor
     - Names for add-ons are shown under optional/explicit in --list-tags
 EOF
 }

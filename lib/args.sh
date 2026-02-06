@@ -24,24 +24,18 @@ Usage:
 
 Modes:
   --help                  Show help
-  --list-tags             List tags (default/optional/explicit scripts)
+  --list-tags             List tags and available add-ons
 
 Notes:
-  - Always-run folders: _req/, _pre/
-  - Tag folders run only when selected: _tags/base/, _tags/dev/, _tags/gaming/, ...
-  - Optional scripts live under _tags/<tag>/optional/
-    - Install all optional scripts for a tag: --<tag>-optional
-    - Install one optional/explicit script: --<tag>--<script>
-      - prefers _tags/<tag>/explicit/<script>.sh if present
-      - else runs _tags/<tag>/optional/<script>.sh
-    - Install optional scripts for supplied tags: -o / --optional
-    - Install all tag folders: --all-tags
-      - To also run optional scripts: --all-tags -o
-  - Explicit scripts live under _tags/<tag>/explicit/
-    - They are only installed via --<tag>--<script> (never via -o/--optional)
-  - For stdin piping (wget/curl):
-    - wget must use -qO- to stream to bash
-    - pass args with: bash -s -- <args>
+  - See what you can install: loadout --list-tags
+  - Install tags by name: loadout --base --dev --gaming
+    - If you pass no tags, it defaults to: --base
+  - Install all tags: loadout --all-tags
+    - Include optional add-ons too: loadout --all-tags -o
+  - Include optional add-ons for selected tags: loadout --dev -o
+  - Install all add-ons for one tag: loadout --dev-optional
+  - Run a single add-on by name: loadout --dev--docker
+    - Names for add-ons are shown under optional/explicit in --list-tags
 EOF
 }
 

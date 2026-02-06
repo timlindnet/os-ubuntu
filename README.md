@@ -6,8 +6,6 @@ Implementation detail: tags map to folders under `_tags/` (e.g. `_tags/dev/`, `_
 
 ## One-liner usage
 
-Prefer `wget` (often installed by default):
-
 ```bash
 wget -qO- https://loadout.timlind.net | bash -s -- --base --dev --gaming --optional
 ```
